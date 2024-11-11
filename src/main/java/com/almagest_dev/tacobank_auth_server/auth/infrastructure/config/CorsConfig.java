@@ -1,4 +1,4 @@
-package com.almagest_dev.tacobank_auth_server.auth.config;
+package com.almagest_dev.tacobank_auth_server.auth.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.cors.CorsConfiguration;

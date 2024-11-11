@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "member")
 @Getter
@@ -38,6 +40,23 @@ public class Member {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", columnDefinition = "BIGINT COMMENT '권한 ID'")
     private Role role;
+
+    @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '가입일자'")
+    private LocalDateTime createdDate;
+
+    @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL COMMENT '수정일자'")
+    private LocalDateTime updatedDate;
+
+    /**
+     * 일자 관련 세팅
+     */
+    @PrePersist
+    public void prePersist() {
+        if (this.createdDate == null) {
+            this.createdDate = LocalDateTime.now();
+        }
+        this.updatedDate = LocalDateTime.now(); // 최초 생성시에도 수정일자 생성
+    }
 
     /**
      * Member 관련 메서드
