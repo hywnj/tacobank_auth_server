@@ -1,4 +1,4 @@
-package com.almagest_dev.tacobank_auth_server.auth.config;
+package com.almagest_dev.tacobank_auth_server.auth.infrastructure.config;
 
 import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.authentication.CustomAuthenticationFilter;
 import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.authentication.JwtAuthenticationFilter;
