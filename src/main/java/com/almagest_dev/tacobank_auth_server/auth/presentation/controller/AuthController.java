@@ -1,4 +1,4 @@
-package com.almagest_dev.tacobank_auth_server.auth.application.controller;
+package com.almagest_dev.tacobank_auth_server.auth.presentation.controller;
 
 import com.almagest_dev.tacobank_auth_server.auth.application.dto.SignupRequestDTO;
 import com.almagest_dev.tacobank_auth_server.auth.application.service.AuthService;
