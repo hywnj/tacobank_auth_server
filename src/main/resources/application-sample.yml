@@ -3,7 +3,7 @@ spring:
     name: tacobank_auth_server
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://{DB_HOST}:{DB_PORT}/{DB_NAME}?useSSL=false&useServerPrepStmts=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
+    url: jdbc:mariadb://{DB_HOST}:{DB_PORT}/{DB_NAME}
     username: {DB_USERNAME}
     password: {DB_PASSWORD}
 
@@ -30,4 +30,4 @@ management:
       enabled: true  # 데이터베이스 연결 상태 확인
 
 server:
-  port: 9002
+  port: 9001
