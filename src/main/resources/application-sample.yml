@@ -3,9 +3,9 @@ spring:
     name: tacobank_auth_server
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://{DB_HOST}:{DB_PORT}/{DB_NAME}
-    username: {DB_USERNAME}
-    password: {DB_PASSWORD}
+    url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&useServerPrepStmts=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
