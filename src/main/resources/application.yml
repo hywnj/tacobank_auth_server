@@ -30,4 +30,4 @@ management:
       enabled: true  # 데이터베이스 연결 상태 확인
 
 server:
-  port: 9001
+  port: ${TACO_AUTH_PORT}
