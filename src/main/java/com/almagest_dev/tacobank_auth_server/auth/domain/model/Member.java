@@ -31,6 +31,9 @@ public class Member {
     @Column(columnDefinition = "VARCHAR(20) NOT NULL COMMENT '이름'")
     private String name;
 
+    @Column(columnDefinition = "VARCHAR(10) NOT NULL COMMENT '생년월일(yyMMdd)'")
+    private String birth;
+
     @Column(columnDefinition = "VARCHAR(20) NOT NULL COMMENT '전화번호'")
     private String tel;
 
@@ -61,14 +64,24 @@ public class Member {
     /**
      * Member 관련 메서드
      */
-    public static Member createMember(String email, String password, String name, String tel, Role role) {
-        Member member = new Member();
-        member.email = email;
-        member.password = password;
-        member.name = name;
-        member.tel = tel;
-        member.role = role;
-        member.deleted = "N";
-        return member;
+    public static Member createMember(String email,
+                                      String password,
+                                      String name,
+                                      String birth,
+                                      String tel,
+                                      Role role) {
+        return new Member(
+                null,                // id는 자동 생성
+                null,                   // 최초 생성시에는 사용자 고유 번호 없음
+                email,                  // 이메일
+                password,               // 비밀번호
+                name,                   // 이름
+                birth,                  // 생년월일
+                tel,                    // 전화번호
+                "N",                    // 탈퇴 여부 (초기값: N)
+                role,                   // 권한
+                LocalDateTime.now(),    // 가입일자
+                LocalDateTime.now()     // 수정일자
+        );
     }
 }
