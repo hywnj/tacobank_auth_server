@@ -13,12 +13,12 @@ public class ExceptionResponseWriter {
     /**
      * Exception 응답 출력
      */
-    public static void writeExceptionResponse(HttpServletResponse response, int status, String error, String message) {
-        response.setStatus(status);
+    public static void writeExceptionResponse(HttpServletResponse response, int httpStatus, String status, String message) {
+        response.setStatus(httpStatus);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        ExceptionResponseDTO exceptionResponse = new ExceptionResponseDTO(error, message);
+        ExceptionResponseDTO exceptionResponse = new ExceptionResponseDTO(status, message);
 
         // 에러메시지 JSON으로 변환
         String jsonResponse = null;
@@ -26,7 +26,7 @@ public class ExceptionResponseWriter {
             jsonResponse = objectMapper.writeValueAsString(exceptionResponse);
         } catch (IOException e) {
             // JSON 변환 실패
-            jsonResponse = "{\"error\": \"" + error + "\", \"message\": \"" + message + "\"}";
+            jsonResponse = "{\"status\": \"" + status + "\", \"message\": \"" + message + "\"}";
         }
         // 응답 출력
         try {
