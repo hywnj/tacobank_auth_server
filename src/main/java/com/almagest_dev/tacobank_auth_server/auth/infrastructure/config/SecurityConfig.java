@@ -5,6 +5,7 @@ import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.authen
 import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.authentication.JwtProvider;
 import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.handler.CustomAccessDeniedHandler;
 import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.handler.CustomAuthenticationEntryPoint;
+import com.almagest_dev.tacobank_auth_server.common.util.RedisSessionUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,18 +24,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity(debug = true)
 public class SecurityConfig {
     private final JwtProvider jwtProvider;
+    private final RedisSessionUtil redisSessionUtil;
 
     private static final String[] PUBLIC_API_URL = { "/auth/**" }; // 인증 없이도 접근 가능한 경로
     private static final String ADMIN_API_URL = "/admin/**"; // 관리자만 접근 가능한 경로
 
-    public SecurityConfig(JwtProvider jwtProvider) {
+    public SecurityConfig(JwtProvider jwtProvider, RedisSessionUtil redisSessionUtil) {
         this.jwtProvider = jwtProvider;
+        this.redisSessionUtil = redisSessionUtil;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtProvider);
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter("/auth/login", authenticationManager, jwtProvider);
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter("/auth/login", authenticationManager, jwtProvider, redisSessionUtil);
 
         http
                 .csrf((csrf) -> csrf.disable()) // CSRF 보호 비활성화
