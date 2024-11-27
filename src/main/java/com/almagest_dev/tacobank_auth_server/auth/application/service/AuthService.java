@@ -1,5 +1,6 @@
 package com.almagest_dev.tacobank_auth_server.auth.application.service;
 
+import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.DuplicateEmailRequestDto;
 import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.SignupRequestDTO;
 import com.almagest_dev.tacobank_auth_server.auth.domain.model.Member;
 import com.almagest_dev.tacobank_auth_server.auth.domain.model.Role;
@@ -17,8 +18,12 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private static final String ALLOWED_SPECIAL_CHARACTERS = "!@_";
 
+
+    /**
+     * 회원 가입 - Member 등록
+     */
     public void registerMember(SignupRequestDTO requestDTO) {
-        if (memberRepository.existsByEmail(requestDTO.getEmail())) {
+        if (memberRepository.existsByEmailAndDeleted(requestDTO.getEmail(), "N")) {
             throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
         }
         if (memberRepository.existsByTelAndDeletedNot(requestDTO.getTel(), "Y")) { // 삭제된 계정이 아닌데 동일 전화번호가 있는 경우
@@ -39,6 +44,16 @@ public class AuthService {
         Member member = Member.createMember(requestDTO.getEmail(), encodedPassword, requestDTO.getName(), requestDTO.getBirth(), requestDTO.getTel(), role);
         memberRepository.save(member);
     }
+
+    /**
+     * 이메일 중복 검사
+     */
+    public void checkDuplicateEmail(DuplicateEmailRequestDto requestDto) {
+        if (memberRepository.existsByEmailAndDeleted(requestDto.getEmail(), "N")) {
+            throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
+        }
+    }
+
 
     /**
      * 비밀번호 규칙 검사
