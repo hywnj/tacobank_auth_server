@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ExceptionResponseDTO {
+public class AuthResponseDto {
     private String status;
     private String message;
 }

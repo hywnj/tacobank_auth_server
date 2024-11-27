@@ -1,6 +1,6 @@
 package com.almagest_dev.tacobank_auth_server.common.exception;
 
-import com.almagest_dev.tacobank_auth_server.common.dto.ExceptionResponseDTO;
+import com.almagest_dev.tacobank_auth_server.common.dto.AuthResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class ExceptionResponseWriter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        ExceptionResponseDTO exceptionResponse = new ExceptionResponseDTO(status, message);
+        AuthResponseDto exceptionResponse = new AuthResponseDto(status, message);
 
         // 에러메시지 JSON으로 변환
         String jsonResponse = null;
