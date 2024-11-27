@@ -1,4 +1,4 @@
-package com.almagest_dev.tacobank_auth_server.auth.application.dto;
+package com.almagest_dev.tacobank_auth_server.auth.presentation.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;

@@ -1,6 +1,7 @@
 package com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.authentication;
 
-import com.almagest_dev.tacobank_auth_server.auth.application.dto.LoginRequestDTO;
+import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.LoginRequestDTO;
+import com.almagest_dev.tacobank_auth_server.common.constants.RedisKeyConstants;
 import com.almagest_dev.tacobank_auth_server.common.exception.ExceptionResponseWriter;
 import com.almagest_dev.tacobank_auth_server.common.exception.RedisSessionException;
 import com.almagest_dev.tacobank_auth_server.common.util.RedisSessionUtil;
@@ -27,9 +28,6 @@ import java.util.concurrent.TimeUnit;
 public class CustomAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private final JwtProvider jwtProvider;
     private final RedisSessionUtil redisSessionUtil;
-
-    private final String FAILURE_PREFIX = "login:failure";
-    private final String LOCK_PREFIX = "login:lock";
 
     public CustomAuthenticationFilter(String defaultFilterProcessesUrl, AuthenticationManager authenticationManager, JwtProvider jwtProvider, RedisSessionUtil redisSessionUtil) {
         super(defaultFilterProcessesUrl, authenticationManager);
@@ -61,10 +59,9 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
 
         try {
             // Redis에서 계정 잠금 상태 확인
-            String lockKey = LOCK_PREFIX + username;
-            String lockStatus = redisSessionUtil.getValueIfExists(lockKey);
-            if ("LOCKED".equals(lockStatus)) {
-                ExceptionResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED", "계정이 잠겨 있습니다. 잠금 해제까지 대기해 주세요.");
+            if (redisSessionUtil.isLocked(username)) {
+                ExceptionResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED", "계정이 잠겨 있습니다. 10분 후 다시 시도하거나 고객센터에 문의해주세요.");
+                return null;
             }
         } catch (RedisSessionException ex) {
             log.warn("RedisSessionException - " + ex.getMessage());
@@ -90,7 +87,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
 
         try {
             // Redis에서 실패 횟수 초기화
-            redisSessionUtil.cleanupRedisKeys("CustomAuthenticationFilter", username, FAILURE_PREFIX);
+            redisSessionUtil.cleanupRedisKeys("CustomAuthenticationFilter", username, RedisKeyConstants.FAILURE_PREFIX);
         }  catch (RedisSessionException ex) {
             log.warn("RedisSessionException - " + ex.getMessage());
             int httpStatus = ex.getHttpStatus().value();
@@ -126,19 +123,19 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
         if (failed instanceof BadCredentialsException) {
             // Request Attribute에서 email 가져옴
             String username = (String) request.getAttribute("email");
-            String redisKey = FAILURE_PREFIX + username; // 실패 횟수 키
-            String lockKey = LOCK_PREFIX + username;    // 계정 잠금 키
+            String redisKey = RedisKeyConstants.FAILURE_PREFIX + username; // 실패 횟수 키
 
             try {
                 // 실패 횟수 증가
-                Long failureCount = redisSessionUtil.incrementAndSetExpire(redisKey, 1L, 10, TimeUnit.MINUTES); // TTL 10분 설정
+                Long failureCount = redisSessionUtil.incrementIfExists(redisKey, 1L, 10, TimeUnit.MINUTES); // TTL 10분 설정
                 log.info("CustomAuthenticationFilter::unsuccessfulAuthentication - Failure count for {}: {}", username, failureCount);
 
                 // 실패 횟수가 5회 이상일 경우 계정 잠금 처리
                 if (failureCount >= 5) {
-                    redisSessionUtil.storeSessionData(lockKey, "LOCKED", 10, TimeUnit.MINUTES); // 계정 잠금 상태 저장
+                    redisSessionUtil.lockAccess(username, 10, TimeUnit.MINUTES); // 계정 잠금 상태 저장
+
                     log.warn("CustomAuthenticationFilter::unsuccessfulAuthentication - Account locked for {}", username);
-                    ExceptionResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_FORBIDDEN, "Account Locked", "비밀번호 입력이 5회 이상 실패하여 계정이 10분간 잠겼습니다. 10분 후 다시 시도해주세요.");
+                    ExceptionResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_FORBIDDEN, "FAILURE", "비밀번호 입력이 5회 이상 실패하여 계정이 10분간 잠겼습니다. 10분 후 다시 시도하거나 고객센터에 문의해주세요.");
                     return;
                 }
 

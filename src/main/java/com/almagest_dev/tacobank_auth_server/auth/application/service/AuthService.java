@@ -1,6 +1,6 @@
 package com.almagest_dev.tacobank_auth_server.auth.application.service;
 
-import com.almagest_dev.tacobank_auth_server.auth.application.dto.SignupRequestDTO;
+import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.SignupRequestDTO;
 import com.almagest_dev.tacobank_auth_server.auth.domain.model.Member;
 import com.almagest_dev.tacobank_auth_server.auth.domain.model.Role;
 import com.almagest_dev.tacobank_auth_server.auth.domain.repository.MemberRepository;

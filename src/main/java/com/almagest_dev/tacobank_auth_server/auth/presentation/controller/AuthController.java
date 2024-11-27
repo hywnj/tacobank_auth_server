@@ -1,7 +1,8 @@
 package com.almagest_dev.tacobank_auth_server.auth.presentation.controller;
 
-import com.almagest_dev.tacobank_auth_server.auth.application.dto.SignupRequestDTO;
+import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.SignupRequestDTO;
 import com.almagest_dev.tacobank_auth_server.auth.application.service.AuthService;
+import com.almagest_dev.tacobank_auth_server.common.dto.AuthResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody @Valid SignupRequestDTO requestDTO) {
         // 회원 등록
         authService.registerMember(requestDTO);
-        return ResponseEntity.ok("회원가입이 성공적으로 완료되었습니다!");
+        return ResponseEntity.ok(new AuthResponseDto("SUCCESS", "회원가입이 성공적으로 완료되었습니다!"));
     }
 
 }
