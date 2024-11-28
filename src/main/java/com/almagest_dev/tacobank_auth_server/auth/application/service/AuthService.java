@@ -31,10 +31,11 @@ public class AuthService {
         }
 
         // 비밀번호 유효성 검증
-        validatePassword(requestDTO.getPassword(), 8, requestDTO.getBirth(), requestDTO.getTel());
+        String password = requestDTO.getPassword().trim(); // 공백 제거
+        validatePassword(password, 8, requestDTO.getBirth(), requestDTO.getTel());
 
         // 비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(requestDTO.getPassword());
+        String encodedPassword = passwordEncoder.encode(password);
 
         // Role 세팅
         Role role = roleRepository.findByRoleName("ROLE_USER")
@@ -108,7 +109,20 @@ public class AuthService {
             return true; // 숫자가 전혀 없는 경우 true 반환
         }
 
-        return str.contains(sanitizedBirthDate) || str.contains(sanitizedTel);
+        // 생년월일 매칭 검사
+        if (str.contains(sanitizedBirthDate.substring(0, 2)) // 연도 확인
+                || str.contains(sanitizedBirthDate.substring(2)) // 월일 확인
+                || str.contains(sanitizedBirthDate) // 전체 확인
+        ) {
+            return true;
+        }
+
+        // 전화번호 매칭 검사
+        if (str.contains(sanitizedTel)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
