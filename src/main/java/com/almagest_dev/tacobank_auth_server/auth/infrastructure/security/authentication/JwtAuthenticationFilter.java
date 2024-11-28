@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import jakarta.servlet.http.Cookie;
 
 import java.io.IOException;
 
@@ -21,7 +22,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JwtAuthenticationFilter::doFilterInternal");
         // 토큰 추출
-        String token = resolveToken(request);
+        String token = getTokenFromCookies(request.getCookies());
         log.info("JwtAuthenticationFilter::doFilterInternal - token: " + token);
         if (token != null && jwtProvider.validateToken(token)) {
             Authentication authentication = jwtProvider.getAuthentication(token);
@@ -33,13 +34,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Header 에서 토큰 추출 ('Bearer' 방식)
+     * Cookie 에서 토큰 추출
      */
-    private String resolveToken(HttpServletRequest request) {
-        log.info("JwtAuthenticationFilter::resolveToken");
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+    private String getTokenFromCookies(Cookie[] cookies) {
+        if (cookies == null) return null;
+
+        for (Cookie cookie : cookies) {
+            if ("Authorization".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
         }
         return null;
     }
