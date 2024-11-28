@@ -5,6 +5,7 @@ import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.authen
 import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.authentication.JwtProvider;
 import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.handler.CustomAccessDeniedHandler;
 import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.handler.CustomAuthenticationEntryPoint;
+import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.handler.CustomLogoutSuccessHandler;
 import com.almagest_dev.tacobank_auth_server.common.util.RedisSessionUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,7 +55,12 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(customAuthenticationFilter, JwtAuthenticationFilter.class)
-        ;
+                .logout((logout) -> logout
+                        .logoutUrl("/taco/auth/logout") // 로그아웃 요청 URL
+                        .logoutSuccessHandler(new CustomLogoutSuccessHandler()) // 로그아웃 성공 핸들러
+                        .deleteCookies("Authorization") // Authorization 쿠키 삭제
+                        // .invalidateHttpSession(true) // 세션 무효화 (STATELESS 설정이므로 거의 의미 없음)
+                );
 
         return http.build();
     }
