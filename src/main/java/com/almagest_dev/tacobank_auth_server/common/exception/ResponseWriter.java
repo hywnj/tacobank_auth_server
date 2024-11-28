@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 
 @Slf4j
-public class ExceptionResponseWriter {
+public class ResponseWriter {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     /**
      * Exception 응답 출력

@@ -37,7 +37,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtProvider);
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter("/auth/login", authenticationManager, jwtProvider, redisSessionUtil);
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter("/taco/auth/login", authenticationManager, jwtProvider, redisSessionUtil);
 
         http
                 .csrf((csrf) -> csrf.disable()) // CSRF 보호 비활성화
