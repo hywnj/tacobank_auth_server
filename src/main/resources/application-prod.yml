@@ -27,7 +27,7 @@ jwt:
   secret: ${TACO_JWT_SECRET}
   expiration: ${TACO_JWT_EXP}
 server:
-  port: ${TACO_CORE_PORT}
+  port: ${TACO_AUTH_PORT}
 
 
 
