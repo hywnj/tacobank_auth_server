@@ -21,8 +21,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-//@EnableWebSecurity
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
+//@EnableWebSecurity(debug = true)
 public class SecurityConfig {
     private final JwtProvider jwtProvider;
     private final RedisSessionUtil redisSessionUtil;
