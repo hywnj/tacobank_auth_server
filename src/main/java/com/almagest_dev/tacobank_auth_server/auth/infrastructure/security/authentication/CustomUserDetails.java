@@ -9,13 +9,15 @@ import java.util.Collection;
 
 
 public class CustomUserDetails implements UserDetails {
+    private Long memberId; // 멤버 ID
     private String email;
     private String password;
     private String role; // 멤버 권한
     private String deleted; // 탈퇴 여부
     private Collection<GrantedAuthority> authorities; //권한 목록
 
-    public CustomUserDetails(String email, String password, String deleted, String role) {
+    public CustomUserDetails(Long memberId, String email, String password, String deleted, String role) {
+        this.memberId = memberId;
         this.email = email;
         this.password = password;
         this.deleted = deleted;
@@ -27,6 +29,10 @@ public class CustomUserDetails implements UserDetails {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(role)); // Role을 Authority로 설정
         return authorities;
+    }
+
+    public Long getMemberId() {
+        return memberId;
     }
 
     @Override

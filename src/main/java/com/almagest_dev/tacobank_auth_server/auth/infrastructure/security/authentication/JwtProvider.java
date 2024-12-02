@@ -30,7 +30,7 @@ public class JwtProvider {
     /**
      * 토큰 생성
      */
-    public String createToken(Authentication authentication) {
+    public String createToken(Authentication authentication, Long memberId) {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
@@ -38,11 +38,11 @@ public class JwtProvider {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(authority -> authority.getAuthority())
                 .collect(Collectors.toList());
-        // @TODO when role is null
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("ROLES", roles)
+                .claim("memberId", memberId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS512, secretKey)
