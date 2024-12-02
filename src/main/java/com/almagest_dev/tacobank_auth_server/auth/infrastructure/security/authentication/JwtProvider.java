@@ -1,9 +1,11 @@
 package com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.authentication;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtProvider {
@@ -30,7 +33,7 @@ public class JwtProvider {
     /**
      * 토큰 생성
      */
-    public String createToken(Authentication authentication) {
+    public String createToken(Authentication authentication, Long memberId) {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
@@ -38,11 +41,11 @@ public class JwtProvider {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(authority -> authority.getAuthority())
                 .collect(Collectors.toList());
-        // @TODO when role is null
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("ROLES", roles)
+                .claim("memberId", memberId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS512, secretKey)
@@ -54,12 +57,23 @@ public class JwtProvider {
      */
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
+            // 토큰 파싱
+            Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()
-                    .parseClaimsJws(token);
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            // Check Member ID
+            Long memberId = claims.get("memberId", Long.class);
+            if (memberId == null) {
+                log.warn("JwtProvider::validateToken member ID is null");
+                return false;
+            }
+
             return true;
         } catch (JwtException | IllegalStateException exception) {
+            log.warn("JwtProvider::validateToken 유효하지 않은 토큰: {}", exception.getMessage());
             return false;
         }
     }

@@ -97,10 +97,13 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
             return;
         }
 
-
         // SecurityContextHolder에 Authenticaton 객체 자동 세팅
+        // CustomUserDetails 에서 멤버 ID 추출
+        CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
+        Long memberId = userDetails.getMemberId();
+
         // 로그인 성공시 JWT 토큰 생성 & 쿠키 세팅
-        String token = jwtProvider.createToken(authResult);
+        String token = jwtProvider.createToken(authResult, memberId);
         log.info("CustomAuthenticationFilter::successfulAuthentication - token: " + token);
 
         Cookie authorizationCookie = new Cookie("Authorization", token);
