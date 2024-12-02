@@ -19,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 //@EnableWebSecurity
@@ -27,7 +28,7 @@ public class SecurityConfig {
     private final JwtProvider jwtProvider;
     private final RedisSessionUtil redisSessionUtil;
 
-    private static final String[] PUBLIC_API_URL = { "/taco/auth/**" }; // 인증 없이도 접근 가능한 경로
+    private static final String[] PUBLIC_API_URL = { "/taco/auth/login", "/taco/auth/join" }; // 인증 없이도 접근 가능한 경로
     private static final String ADMIN_API_URL = "/taco/admin/**"; // 관리자만 접근 가능한 경로
 
     public SecurityConfig(JwtProvider jwtProvider, RedisSessionUtil redisSessionUtil) {
@@ -54,6 +55,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(new CustomAccessDeniedHandler()) // 403 Forbidden
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, LogoutFilter.class) // JwtAuthenticationFilter가 먼저 실행
                 .addFilterAfter(customAuthenticationFilter, JwtAuthenticationFilter.class)
                 .logout((logout) -> logout
                         .logoutUrl("/taco/auth/logout") // 로그아웃 요청 URL
