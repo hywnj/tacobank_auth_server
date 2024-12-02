@@ -22,8 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
-//@EnableWebSecurity
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
+//@EnableWebSecurity(debug = true)
 public class SecurityConfig {
     private final JwtProvider jwtProvider;
     private final RedisSessionUtil redisSessionUtil;
