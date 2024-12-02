@@ -125,6 +125,6 @@ $RECYCLE.BIN/
 
 # application.yml 파일을 무시하도록 설정
 src/main/resources/application.yml
-src/main/resources/application-KEY.yml
+**/application-*.yml
 
 *.log
