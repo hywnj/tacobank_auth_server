@@ -28,7 +28,7 @@ public class SecurityConfig {
     private final JwtProvider jwtProvider;
     private final RedisSessionUtil redisSessionUtil;
 
-    private static final String[] PUBLIC_API_URL = { "/taco/auth/login", "/taco/auth/members" }; // 인증 없이도 접근 가능한 경로
+    private static final String[] PUBLIC_API_URL = { "/taco/auth/login", "/taco/auth/members", "/taco/auth/email" }; // 인증 없이도 접근 가능한 경로
     private static final String ADMIN_API_URL = "/taco/admin/**"; // 관리자만 접근 가능한 경로
 
     public SecurityConfig(JwtProvider jwtProvider, RedisSessionUtil redisSessionUtil) {
