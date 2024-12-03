@@ -1,9 +1,11 @@
 package com.almagest_dev.tacobank_auth_server.auth.infrastructure.s3;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class LogScheduler {
 
     private final S3Uploader s3Uploader;
@@ -12,10 +14,10 @@ public class LogScheduler {
         this.s3Uploader = s3Uploader;
     }
 
-    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정 실행
+    @Scheduled(cron = "0 0 5 * * ?") // 매일 새벽 5시 실행
     public void scheduleLogUpload() {
-        System.out.println("Starting daily log upload to S3...");
+        log.info("Starting daily log upload to S3...");
         s3Uploader.uploadLogsToS3();
-        System.out.println("Daily log upload to S3 completed.");
+        log.info("Daily log upload to S3 completed.");
     }
 }
