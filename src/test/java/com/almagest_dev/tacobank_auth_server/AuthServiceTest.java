@@ -74,7 +74,7 @@ class AuthServiceTest {
         verify(memberRepository, times(1)).save(argThat(member ->
                 member.getEmail().equals("test@example.com") &&
                         member.getTel().equals("01012345678") &&
-                        member.getName().equals("John Doe") &&
+                        member.getName().equals("John Doe1") &&
                         member.getRole().getRoleName().equals("ROLE_USER")
         ));
     }
