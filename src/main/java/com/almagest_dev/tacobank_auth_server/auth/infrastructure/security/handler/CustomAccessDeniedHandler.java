@@ -1,5 +1,6 @@
 package com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.handler;
 
+import com.almagest_dev.tacobank_auth_server.common.dto.AuthResponseDto;
 import com.almagest_dev.tacobank_auth_server.common.exception.ResponseWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         log.info("CustomAccessDeniedHandler - Exception Message: " + accessDeniedException.getMessage());
-        ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_FORBIDDEN, "Forbidden", "접근 권한이 없습니다.");
+        ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_FORBIDDEN, new AuthResponseDto<>("FAILURE", "접근 권한이 없습니다."));
     }
 }
