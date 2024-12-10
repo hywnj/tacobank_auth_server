@@ -1,5 +1,6 @@
 package com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.handler;
 
+import com.almagest_dev.tacobank_auth_server.common.dto.AuthResponseDto;
 import com.almagest_dev.tacobank_auth_server.common.exception.ResponseWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         log.info("CustomAuthenticationEntryPoint - Exception Message: " + authException.getMessage());
-        ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED", "로그인이 필요합니다.");
+        ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_UNAUTHORIZED, new AuthResponseDto<>("UNAUTHORIZED", "로그인이 필요합니다."));
     }
 }

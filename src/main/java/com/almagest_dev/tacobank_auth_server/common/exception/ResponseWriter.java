@@ -13,19 +13,19 @@ public class ResponseWriter {
     /**
      * Exception 응답 출력
      */
-    public static void writeExceptionResponse(HttpServletResponse response, int httpStatus, String status, String message) {
+    public static <T> void writeExceptionResponse(HttpServletResponse response, int httpStatus, AuthResponseDto<T> authResponseDto) {
         response.setStatus(httpStatus);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        AuthResponseDto exceptionResponse = new AuthResponseDto(status, message);
-
         // 에러메시지 JSON으로 변환
         String jsonResponse = null;
         try {
-            jsonResponse = objectMapper.writeValueAsString(exceptionResponse);
+            jsonResponse = objectMapper.writeValueAsString(authResponseDto);
         } catch (IOException e) {
             // JSON 변환 실패
+            String status = (authResponseDto.getStatus() != null) ? authResponseDto.getStatus() : "FAILURE";
+            String message = (authResponseDto.getMessage() != null) ? authResponseDto.getMessage() : "요청이 실패했습니다.";
             jsonResponse = "{\"status\": \"" + status + "\", \"message\": \"" + message + "\"}";
         }
         // 응답 출력

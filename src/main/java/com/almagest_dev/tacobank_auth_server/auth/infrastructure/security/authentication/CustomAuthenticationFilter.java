@@ -2,6 +2,7 @@ package com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.authe
 
 import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.LoginRequestDTO;
 import com.almagest_dev.tacobank_auth_server.common.constants.RedisKeyConstants;
+import com.almagest_dev.tacobank_auth_server.common.dto.AuthResponseDto;
 import com.almagest_dev.tacobank_auth_server.common.exception.ResponseWriter;
 import com.almagest_dev.tacobank_auth_server.common.exception.RedisSessionException;
 import com.almagest_dev.tacobank_auth_server.common.util.RedisSessionUtil;
@@ -22,6 +23,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -60,7 +62,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
         try {
             // Redis에서 계정 잠금 상태 확인
             if (redisSessionUtil.isLocked(username)) {
-                ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED", "계정이 잠겨 있습니다. 10분 후 다시 시도하거나 고객센터에 문의해주세요.");
+                ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_UNAUTHORIZED, new AuthResponseDto<>("UNAUTHORIZED", "계정이 잠겨 있습니다. 10분 후 다시 시도하거나 고객센터에 문의해주세요."));
                 return null;
             }
         } catch (RedisSessionException ex) {
@@ -68,7 +70,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
             int httpStatus = ex.getHttpStatus().value();
             String message = (ex.getHttpStatus() == HttpStatus.INTERNAL_SERVER_ERROR) ? "서버 내부 오류가 발생했습니다. 관리자에게 문의해주세요." : ex.getMessage();
 
-            ResponseWriter.writeExceptionResponse(response, httpStatus, "FAILURE", message);
+            ResponseWriter.writeExceptionResponse(response, httpStatus, new AuthResponseDto<>("FAILURE", message));
             return null;
         }
 
@@ -93,7 +95,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
             int httpStatus = ex.getHttpStatus().value();
             String message = (ex.getHttpStatus() == HttpStatus.INTERNAL_SERVER_ERROR) ? "서버 내부 오류가 발생했습니다. 관리자에게 문의해주세요." : ex.getMessage();
 
-            ResponseWriter.writeExceptionResponse(response, httpStatus, "FAILURE", message);
+            ResponseWriter.writeExceptionResponse(response, httpStatus, new AuthResponseDto<>("FAILURE", message));
             return;
         }
 
@@ -115,7 +117,9 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
         response.addHeader("Authorization", "Bearer " + token);
 
         // 로그인 성공 응답 반환
-        ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_OK, "SUCCESS", "로그인에 성공했습니다!");
+        Map<String, Long> data = new HashMap<>();
+        data.put("memberId", 1L);
+        ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_OK, new AuthResponseDto<>("SUCCESS", "로그인에 성공했습니다!", data));
     }
 
     /**
@@ -141,7 +145,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
                     redisSessionUtil.lockAccess(username, 10, TimeUnit.MINUTES); // 계정 잠금 상태 저장
 
                     log.warn("CustomAuthenticationFilter::unsuccessfulAuthentication - Account locked for {}", username);
-                    ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_FORBIDDEN, "FAILURE", "비밀번호 입력이 5회 이상 실패하여 계정이 10분간 잠겼습니다. 10분 후 다시 시도하거나 고객센터에 문의해주세요.");
+                    ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_FORBIDDEN, new AuthResponseDto<>("FAILURE", "비밀번호 입력이 5회 이상 실패하여 계정이 10분간 잠겼습니다. 10분 후 다시 시도하거나 고객센터에 문의해주세요."));
                     return;
                 }
 
@@ -150,12 +154,12 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
                 int httpStatus = ex.getHttpStatus().value();
                 String message = (ex.getHttpStatus() == HttpStatus.INTERNAL_SERVER_ERROR) ? "서버 내부 오류가 발생했습니다. 관리자에게 문의해주세요." : ex.getMessage();
 
-                ResponseWriter.writeExceptionResponse(response, httpStatus, "FAILURE", message);
+                ResponseWriter.writeExceptionResponse(response, httpStatus, new AuthResponseDto<>("FAILURE", message));
                 return;
             }
         }
 
         // 실패 메시지 반환
-        ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED", "아이디 또는 비밀번호가 잘못되었습니다. 다시 시도해주세요.");
+        ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_UNAUTHORIZED, new AuthResponseDto<>("UNAUTHORIZED", "아이디 또는 비밀번호가 잘못되었습니다. 다시 시도해주세요."));
     }
 }
