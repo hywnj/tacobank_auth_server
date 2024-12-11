@@ -38,6 +38,9 @@ public class Member {
     @Column(columnDefinition = "VARCHAR(20) NOT NULL COMMENT '전화번호'")
     private String tel;
 
+    @Column(columnDefinition = "VARCHAR(1) NOT NULL COMMENT '최초 계좌연동 여부(Y, N)'")
+    private String mydataLinked;
+
     @Column(columnDefinition = "VARCHAR(255) COMMENT '출금 비밀번호'")
     private String transferPin;
 
@@ -82,6 +85,7 @@ public class Member {
                 name,                   // 이름
                 birth,                  // 생년월일
                 tel,                    // 전화번호
+                "N",                    // 최초 계좌 연동 여부
                 null,                   // 출금 비밀번호
                 "N",                    // 탈퇴 여부 (초기값: N)
                 role,                   // 권한

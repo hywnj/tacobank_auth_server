@@ -1,6 +1,7 @@
 package com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.authentication;
 
 import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.LoginRequestDTO;
+import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.LoginResponseDto;
 import com.almagest_dev.tacobank_auth_server.common.constants.RedisKeyConstants;
 import com.almagest_dev.tacobank_auth_server.common.dto.AuthResponseDto;
 import com.almagest_dev.tacobank_auth_server.common.exception.ResponseWriter;
@@ -117,9 +118,10 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
         response.addHeader("Authorization", "Bearer " + token);
 
         // 로그인 성공 응답 반환
-        Map<String, Long> data = new HashMap<>();
-        data.put("memberId", 1L);
-        ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_OK, new AuthResponseDto<>("SUCCESS", "로그인에 성공했습니다!", data));
+        LoginResponseDto responseDto = new LoginResponseDto(memberId, userDetails.getMydataLinked());
+        log.info("memberId: {}, getMydataLinked: {}" , memberId, userDetails.getMydataLinked());
+
+        ResponseWriter.writeExceptionResponse(response, HttpServletResponse.SC_OK, new AuthResponseDto<>("SUCCESS", "로그인에 성공했습니다!", responseDto));
     }
 
     /**

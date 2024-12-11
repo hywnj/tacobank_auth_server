@@ -23,6 +23,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Member member = memberRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("아이디가 존재하지 않습니다."));
-        return new CustomUserDetails(member.getId(), member.getEmail(), member.getPassword(), member.getDeleted(), member.getRole().getRoleName());
+        return new CustomUserDetails(member.getId(), member.getEmail(), member.getPassword(), member.getDeleted(), member.getMydataLinked(), member.getRole().getRoleName());
     }
 }
