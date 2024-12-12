@@ -30,7 +30,16 @@ public class RedisSessionUtil {
         }
 
         try {
-            String valueToStore = objectMapper.writeValueAsString(data);
+            String valueToStore;
+
+            if (data instanceof String) {
+                // 데이터가 String인 경우 그대로 저장
+                valueToStore = (String) data;
+            } else {
+                // String이 아닌 경우 ObjectMapper를 사용하여 JSON 직렬화
+                valueToStore = objectMapper.writeValueAsString(data);
+            }
+
             // Redis에 Set
             redisTemplate.opsForValue().set(redisKey, valueToStore, duration, unit);
         } catch (Exception e) {
