@@ -4,13 +4,13 @@ import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.DuplicateEmai
 import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.SignupRequestDTO;
 import com.almagest_dev.tacobank_auth_server.auth.application.service.AuthService;
 import com.almagest_dev.tacobank_auth_server.common.dto.AuthResponseDto;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.Cookie;
 
 @RestController
 @RequestMapping("/taco/auth")
@@ -36,4 +36,22 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponseDto("SUCCESS", "사용 가능한 이메일 입니다."));
     }
 
+    /**
+     * 세션 연장
+     */
+    @PostMapping("/extend-session")
+    public ResponseEntity<?> extendSession(HttpServletRequest request, HttpServletResponse response) {
+        // 새 토큰 발급
+        String newToken = authService.extendSession(request.getCookies());
+
+        // 쿠키 설정
+        Cookie authorizationCookie = new Cookie("Authorization", newToken);
+        authorizationCookie.setHttpOnly(true);
+        authorizationCookie.setSecure(true); // HTTPS 환경에서는 true로 설정
+        authorizationCookie.setMaxAge(60 * 10); // 10분
+        authorizationCookie.setPath("/"); // 모든 경로에서 유효
+        response.addCookie(authorizationCookie);
+
+        return ResponseEntity.ok(new AuthResponseDto<>("SUCCESS", "세션 연장 성공"));
+    }
 }

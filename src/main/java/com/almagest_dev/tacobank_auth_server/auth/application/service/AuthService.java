@@ -1,11 +1,15 @@
 package com.almagest_dev.tacobank_auth_server.auth.application.service;
 
+import com.almagest_dev.tacobank_auth_server.auth.infrastructure.persistence.TokenBlackList;
+import com.almagest_dev.tacobank_auth_server.auth.infrastructure.security.authentication.JwtProvider;
 import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.DuplicateEmailRequestDto;
 import com.almagest_dev.tacobank_auth_server.auth.presentation.dto.SignupRequestDTO;
 import com.almagest_dev.tacobank_auth_server.auth.domain.model.Member;
 import com.almagest_dev.tacobank_auth_server.auth.domain.model.Role;
 import com.almagest_dev.tacobank_auth_server.auth.domain.repository.MemberRepository;
 import com.almagest_dev.tacobank_auth_server.auth.domain.repository.RoleRepository;
+import com.almagest_dev.tacobank_auth_server.common.exception.InvalidTokenException;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +20,8 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
+    private final TokenBlackList tokenBlackList;
     private static final String ALLOWED_SPECIAL_CHARACTERS = "!@_";
 
 
@@ -170,5 +176,43 @@ public class AuthService {
      */
     private static String removeNonDigits(String input) {
         return input == null ? "" : input.replaceAll("[^0-9]", "");
+    }
+
+    /**
+     * 세션 연장
+     */
+    public String extendSession(Cookie[] cookies) {
+        // 쿠키에서 토큰 추출
+        String token = getTokenFromCookies(cookies);
+        if (token == null || !jwtProvider.validateToken(token)) {
+            throw new InvalidTokenException("토큰이 유효하지 않습니다.");
+        }
+
+        // 블랙리스트 확인
+        if (tokenBlackList.isTokenBlacklisted(token)) {
+            throw new InvalidTokenException("블랙리스트에 등록된 토큰입니다.");
+        }
+
+        // 기존 토큰 블랙리스트에 추가
+        long remainExpiration = jwtProvider.getRemainingExpiration(token);
+        tokenBlackList.addTokenToBlackList(token, remainExpiration);
+
+        // 새 토큰 발급
+        long memberId = jwtProvider.getClaimsFromToken(token).get("memberId", Long.class);
+        return jwtProvider.createToken(jwtProvider.getAuthentication(token), memberId);
+    }
+
+    /**
+     * Cookie 에서 토큰 추출
+     */
+    private String getTokenFromCookies(Cookie[] cookies) {
+        if (cookies == null) return null;
+
+        for (Cookie cookie : cookies) {
+            if ("Authorization".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 }

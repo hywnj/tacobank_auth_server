@@ -31,6 +31,7 @@ public class TokenBlackList {
      * @return 블랙리스트에 있으면 true, 없으면 false
      */
     public boolean isTokenBlacklisted(String token) {
+        log.info("TokenBlackList::isTokenBlackListed - {}", token);
         String redisKey = RedisKeyConstants.BLACKLIST_PREFIX + token;
 
         // Redis key 조회
