@@ -101,6 +101,17 @@ public class JwtProvider {
     }
 
     /**
+     * 토큰에서 클레임 추출
+     */
+    public Claims getClaimsFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    /**
      * 토큰에서 권한 정보 추출
      */
     public Collection<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
@@ -114,5 +125,19 @@ public class JwtProvider {
         return role.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 남은 만료시간 조회
+     */
+    public long getRemainingExpiration(String token) {
+        try {
+            Claims claims = getClaimsFromToken(token); // 토큰에서 클레임 추출
+            long expirationTime = claims.getExpiration().getTime(); // 만료 시간 (밀리초)
+            return expirationTime - System.currentTimeMillis(); // 남은 시간 계산
+        } catch (Exception e) {
+            log.error("JwtProvider - 만료 시간 계산 실패: {}", e.getMessage());
+            return 0; // 실패 시 0 반환
+        }
     }
 }

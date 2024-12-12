@@ -74,6 +74,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(InvalidTokenException.class) // 데이터 무결성 제약 조건을 위반했을 때 발생하는 예외 (데이터베이스에 저장할 때 NULL 값이 들어가면 안 되는 칼럼에 NULL이 들어간 경우나 고유 제약 조건을 위반한 경우)
+    public ResponseEntity<?> handleInvalidTokenException(InvalidTokenException ex) {
+        log.warn("InvalidTokenException - " + ex.getMessage());
+        AuthResponseDto response = new AuthResponseDto("FAILURE", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+
     // 포괄적인 서버 오류 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleServerError(Exception ex) {
