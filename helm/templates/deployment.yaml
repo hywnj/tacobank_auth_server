@@ -29,7 +29,7 @@ spec:
         {{- end }}
 
       imagePullSecrets:
-        - name: ecr-secret
+        - name: ecr-secret-auth
       volumes:
         - name: config-volume
           configMap:
