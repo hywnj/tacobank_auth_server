@@ -5,7 +5,7 @@ image:
   tag: "latest"
   pullPolicy: "IfNotPresent"
 
-namespace: "taco-core"
+namespace: "taco-auth"
 createNamespace: false
 
 
@@ -36,8 +36,8 @@ nodeAffinity:
     - key: "kubernetes.io/hostname"
       operator: "In"
       values:
-        - "ip-172-31-21-139"  // 인증서버용 워커노드로 변경필요
-        - "ip-172-31-22-110"
+        - "ip-172-31-27-15"
+        - "ip-172-31-39-41"
 
 env:
   DDL_TYPE: "update"
