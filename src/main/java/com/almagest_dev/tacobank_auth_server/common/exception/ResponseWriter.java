@@ -1,6 +1,6 @@
 package com.almagest_dev.tacobank_auth_server.common.exception;
 
-import com.almagest_dev.tacobank_auth_server.common.dto.ExceptionResponseDTO;
+import com.almagest_dev.tacobank_auth_server.common.dto.AuthResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -8,25 +8,25 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 
 @Slf4j
-public class ExceptionResponseWriter {
+public class ResponseWriter {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     /**
      * Exception 응답 출력
      */
-    public static void writeExceptionResponse(HttpServletResponse response, int status, String error, String message) {
-        response.setStatus(status);
+    public static <T> void writeExceptionResponse(HttpServletResponse response, int httpStatus, AuthResponseDto<T> authResponseDto) {
+        response.setStatus(httpStatus);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-
-        ExceptionResponseDTO exceptionResponse = new ExceptionResponseDTO(error, message);
 
         // 에러메시지 JSON으로 변환
         String jsonResponse = null;
         try {
-            jsonResponse = objectMapper.writeValueAsString(exceptionResponse);
+            jsonResponse = objectMapper.writeValueAsString(authResponseDto);
         } catch (IOException e) {
             // JSON 변환 실패
-            jsonResponse = "{\"error\": \"" + error + "\", \"message\": \"" + message + "\"}";
+            String status = (authResponseDto.getStatus() != null) ? authResponseDto.getStatus() : "FAILURE";
+            String message = (authResponseDto.getMessage() != null) ? authResponseDto.getMessage() : "요청이 실패했습니다.";
+            jsonResponse = "{\"status\": \"" + status + "\", \"message\": \"" + message + "\"}";
         }
         // 응답 출력
         try {

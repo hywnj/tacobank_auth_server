@@ -19,6 +19,7 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     @Column(columnDefinition = "VARCHAR(40) COMMENT '사용자 금융 식별번호'")
     private String userFinanceId;
 
@@ -36,6 +37,12 @@ public class Member {
 
     @Column(columnDefinition = "VARCHAR(20) NOT NULL COMMENT '전화번호'")
     private String tel;
+
+    @Column(columnDefinition = "VARCHAR(1) NOT NULL COMMENT '최초 계좌연동 여부(Y, N)'")
+    private String mydataLinked;
+
+    @Column(columnDefinition = "VARCHAR(255) COMMENT '출금 비밀번호'")
+    private String transferPin;
 
     @Column(columnDefinition = "VARCHAR(1) DEFAULT 'N' NOT NULL COMMENT '탈퇴 여부(탈퇴시, Y)'")
     private String deleted;
@@ -78,6 +85,8 @@ public class Member {
                 name,                   // 이름
                 birth,                  // 생년월일
                 tel,                    // 전화번호
+                "N",                    // 최초 계좌 연동 여부
+                null,                   // 출금 비밀번호
                 "N",                    // 탈퇴 여부 (초기값: N)
                 role,                   // 권한
                 LocalDateTime.now(),    // 가입일자
