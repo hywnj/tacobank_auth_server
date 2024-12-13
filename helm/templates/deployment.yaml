@@ -44,7 +44,7 @@ spec:
           ports:
             - containerPort: 9001
           args:
-            - "--spring.config.location=/config/auth"
+            - "--spring.config.location=/config/auth/"
           volumeMounts:
             - name: config-volume
               mountPath: /config/auth
