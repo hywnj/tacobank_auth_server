@@ -45,7 +45,7 @@ data:
     aws:
       s3:
         bucket-name: {{ .Values.env.AWS_S3_BUCKET_NAME }}
-        folder: {{ .Values.env.AWS_S3_FOLDER_PATH_CORE }}
+        folder: {{ .Values.env.AWS_S3_FOLDER_PATH_AUTH }}
         access-key: {{ .Values.env.AWS_S3_IAM_ACCESS_KEY }}
         secret-key: {{ .Values.env.AWS_S3_IAM_SECRET_KEY }}
         region: {{ .Values.env.AWS_S3_REGION }}
